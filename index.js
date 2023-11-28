@@ -55,8 +55,45 @@ async function run() {
         const reviewCollections = client.db('Quick-Del').collection('reviews')
 
 
-      
+        app.post('/api/v1/jwt', async (req, res) => {
+            const user = req.body
+            const token = jwt.sign(user, process.env.JWT_SECRET_KEY, { expiresIn: '10h' })
+            res.cookie('token', token, {
+                httpOnly: true,
+                secure: true,
+                sameSite: 'none'
+            })
+                .send({ success: true })
+        })
 
+        app.post('/api/v1/logout', async (req, res) => {
+            const user = req.body;
+            res.clearCookie('token', { maxAge: 0 }).send({ success: true })
+        })
+
+
+        //Store user data 
+        app.post('/api/v1/users', async (req, res) => {
+            const user = req.body;
+            const result = await userCollections.insertOne(user)
+            res.send(result)
+        })
+
+
+        //Store parcel data 
+        app.post('/api/v1/parcels', async (req, res) => {
+            const parcel = req.body;
+            const result = await parcelCollections.insertOne(parcel)
+            res.send(result)
+        })
+        //Store Review data 
+        app.post('/api/v1/reviews', async (req, res) => {
+            const review = req.body;
+            const result = await reviewCollections.insertOne(review)
+            res.send(result)
+        })
+
+        
 
 
 
