@@ -5,13 +5,13 @@ require('dotenv').config()
 const cors = require('cors');
 const jwt = require('jsonwebtoken')
 const cookieParser = require('cookie-parser');
-// const stripe = require('stripe')(process.env.STRIPE_PAYMENT_SECRET)
+const stripe = require('stripe')(process.env.STRIPE_PAYMENT_SECRET)
 const port = process.env.PORT || 5000;
 
 
 
 app.use(cors({
-    origin: ['http://localhost:5173'],
+    origin: ['https://quick-del.web.app'],
     credentials: true
 }));
 app.use(express.json());
@@ -131,6 +131,85 @@ async function run() {
                 res.status(500).send('Internal Server Error');
             }
         });
+
+        //get review data 
+        app.get('/api/v1/reviews', async (req, res) => {
+            const id = req.query.id;
+            const query = {}
+            if (id) {
+                query.deliverymenId = id
+            }
+
+            const result = await reviewCollections.find(query).toArray()
+            res.send(result)
+        })
+
+        // Get method for parcels
+        app.get('/api/v1/parcels', async (req, res) => {
+            const cursor = parcelCollections.find();
+            const result = await cursor.toArray()
+            res.send(result)
+        })
+
+        //Get single parcel for update
+        app.get('/api/v1/parcels/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) }
+            const result = await parcelCollections.find(query).toArray()
+            res.send(result)
+        })
+        //count data 
+        app.get('/api/v1/countusers', async (req, res) => {
+            const count = await userCollections.estimatedDocumentCount();
+            res.send({ count })
+        })
+
+        //Get all parcels 
+        app.get('/api/v1/allparcels', async (req, res) => {
+            const parcelStatus = req.query.parcelStatus;
+            console.log(parcelStatus)
+            const role = req.query.role;
+            console.log(role)
+            const userEmail = req.query.email;
+            console.log(userEmail)
+
+            const query = {};
+
+            if (userEmail) {
+                query.email = userEmail;
+            }
+            if (parcelStatus) {
+                query.status = parcelStatus;
+            }
+
+
+            const result = await parcelCollections.find(query).toArray()
+            res.send(result)
+        })
+
+        //Get user parcels data
+        app.get('/api/v1/parcels', verifyToken, async (req, res) => {
+            const userEmail = req.query.email;
+            const role = req.query.role;
+            const jwtEmail = req.user.email;
+            if (userEmail !== jwtEmail) {
+                return res.status(403).send({ message: 'Forbidden Access' })
+            }
+            const query = {}
+            if (userEmail && role === 'user') {
+                query.email = userEmail;
+            }
+
+            const result = await parcelCollections.find(query).toArray()
+            res.send(result)
+        })
+
+
+
+
+        //Count average rating and user data 
+
+
 
 
 
