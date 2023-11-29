@@ -93,6 +93,25 @@ async function run() {
             res.send(result)
         })
 
+        //Use Payment method by Post 
+        app.post('/api/v1/create-payment-intent', async (req, res) => {
+            const { totalPrice } = req.body;
+            console.log(totalPrice)
+            const amount = parseInt(totalPrice * 100);
+            if (amount < 1) {
+                return
+            }
+            const paymentIntent = await stripe.paymentIntents.create({
+                amount: amount,
+                currency: 'usd',
+                payment_method_types: ['card']
+            })
+            res.send({
+                clientSecret: paymentIntent.client_secret
+            })
+        })
+
+
         //Get user data 
         app.get('/api/v1/users', verifyToken, async (req, res) => {
             const userEmail = req.query.email;
@@ -205,7 +224,7 @@ async function run() {
         })
 
 
-
+  
 
         //Count average rating and user data 
 
