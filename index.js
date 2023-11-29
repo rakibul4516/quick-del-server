@@ -93,7 +93,45 @@ async function run() {
             res.send(result)
         })
 
-        
+        //Get user data 
+        app.get('/api/v1/users', verifyToken, async (req, res) => {
+            const userEmail = req.query.email;
+            const jwtEmail = req.user.email;
+            if (userEmail !== jwtEmail) {
+                return res.status(403).send({ message: 'Forbidden Access' })
+            }
+            const query = {}
+            if (userEmail) {
+                query.email = userEmail;
+            }
+
+            const result = await userCollections.find(query).toArray()
+            res.send(result)
+        })
+
+        //Get alluser data
+        app.get('/api/v1/allusers', async (req, res) => {
+            try {
+                const role = req.query.role;
+                console.log(role);
+                const query = { role: role };
+
+                // Pagination 
+                const page = Number(req.query.page);
+                console.log(page);
+                const limit = Number(req.query.limit);
+                console.log(limit);
+                const skip = (page - 1) * limit;
+                const cursor = userCollections.find(query).skip(skip).limit(limit);
+                const result = await cursor.toArray();
+                console.log(result)
+                res.send(result);
+            } catch (error) {
+                console.error('Error retrieving users:', error);
+                res.status(500).send('Internal Server Error');
+            }
+        });
+
 
 
 
