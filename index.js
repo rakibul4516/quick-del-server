@@ -132,15 +132,14 @@ async function run() {
         app.get('/api/v1/allusers', async (req, res) => {
             try {
                 const role = req.query.role;
+                // Pagination 
+                const page = Number(req.query.page)
+                const limit = Number(req.query.limit)
+                const skip = page * limit
+                console.log(skip)
                 console.log(role);
                 const query = { role: role };
-
-                // Pagination 
-                const page = Number(req.query.page);
-                console.log(page);
-                const limit = Number(req.query.limit);
-                console.log(limit);
-                const skip = (page - 1) * limit;
+                console.log(query)
                 const cursor = userCollections.find(query).skip(skip).limit(limit);
                 const result = await cursor.toArray();
                 console.log(result)
@@ -205,6 +204,9 @@ async function run() {
             const result = await parcelCollections.find(query).toArray()
             res.send(result)
         })
+
+
+
 
         //Get user parcels data
         app.get('/api/v1/parcels', verifyToken, async (req, res) => {
@@ -304,7 +306,13 @@ async function run() {
         });
 
 
-
+        //Cancel/Delete parcel
+        app.delete('/api/v1/parcels/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) }
+            const result = await parcelCollections.deleteOne(query)
+            res.send(result)
+        })
 
 
 
