@@ -253,6 +253,62 @@ async function run() {
             res.send(result)
         })
 
+        //Update delivery man id and date into parcels
+        app.patch('/api/v1/users/:id', async (req, res) => {
+            const id = req.params.id;
+            const filter = { _id: new ObjectId(id) };
+            const modifyData = req.body;
+
+            const update = {
+                $set: {
+                    totalDeliver: modifyData.totalDeliver,
+                },
+            };
+
+            const result = await userCollections.updateOne(filter, update);
+            res.send(result);
+        });
+        //Update delivery man id and date into parcels
+        app.patch('/api/v1/user/:id', async (req, res) => {
+            const id = req.params.id;
+            const filter = { _id: new ObjectId(id) };
+            const modifyData = req.body;
+
+            const update = {
+                $set: {
+                    image: modifyData.userImage,
+                    // totalReviews: modifyData.totalReview
+                },
+            };
+
+            const result = await userCollections.updateOne(filter, update);
+            res.send(result);
+        });
+
+
+
+        //Update make delivery man  and admin
+        app.patch('/api/v1/user/:id', async (req, res) => {
+            const id = req.params.id;
+            const filter = { _id: new ObjectId(id) };
+            const modifyData = req.body;
+
+            const update = {
+                $set: {
+                    role: modifyData.setrole
+                },
+            };
+
+            const result = await userCollections.updateOne(filter, update);
+            res.send(result);
+        });
+
+
+
+
+
+
+
         //Count average rating and user data 
 
 
