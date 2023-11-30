@@ -11,7 +11,7 @@ const port = process.env.PORT || 5000;
 
 
 app.use(cors({
-    origin: ['https://quick-del.web.app'],
+    origin: ['http://localhost:5173'],
     credentials: true
 }));
 app.use(express.json());
@@ -224,7 +224,34 @@ async function run() {
         })
 
 
-  
+        //Update delivery man id and date into parcels
+        app.put('/api/v1/parcels/:id', async (req, res) => {
+            const id = req.params.id;
+            const filter = { _id: new ObjectId(id) };
+            const options = { upsert: true };
+            const modifyData = req.body;
+            const foods = {
+                $set: {
+                    deliveryAddress: modifyData.deliveryAddress,
+                    deliveryDate: modifyData.deliveryDate,
+                    email: modifyData.email,
+                    latitude: modifyData.latitude,
+                    longitude: modifyData.longitude,
+                    parcelType: modifyData.parcelType,
+                    parcelWeight: modifyData.parcelWeight,
+                    phoneNumber: modifyData.phoneNumber,
+                    price: modifyData.price,
+                    receiverName: modifyData.receiverName,
+                    receiverNumber: modifyData.receiverNumber,
+                    senderName: modifyData.senderName,
+                    deliverymen: modifyData.deliverymen,
+                    assignDate: modifyData.assignDate,
+                    status: modifyData.status,
+                }
+            };
+            const result = await parcelCollections.updateOne(filter, foods, options)
+            res.send(result)
+        })
 
         //Count average rating and user data 
 
