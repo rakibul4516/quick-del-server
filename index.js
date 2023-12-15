@@ -11,7 +11,7 @@ const port = process.env.PORT || 5000;
 
 
 app.use(cors({
-    origin: ['http://localhost:5173'],
+    origin: ['https://quick-del.web.app'],
     credentials: true
 }));
 app.use(express.json());
@@ -204,6 +204,27 @@ async function run() {
             const result = await parcelCollections.find(query).toArray()
             res.send(result)
         })
+
+
+        app.get('/api/v1/averagecount', async (req, res) => {
+            try {
+                const userAggregateCursor = await userCollections.aggregate([
+                    {
+                        $sort: { totalDeliver: -1 } 
+                    }
+                ]);
+        
+
+                const sortedUserData = await userAggregateCursor.toArray();
+        
+                console.log(sortedUserData); 
+        
+                res.send(sortedUserData); 
+            } catch (error) {
+                res.status(500).send({ error: 'Internal Server Error' });
+            }
+        });
+        
 
 
 
